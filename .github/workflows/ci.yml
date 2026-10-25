@@ -66,6 +66,10 @@ jobs:
       - name: Audit NuGet dependencies
         run: dotnet list automation/BooksApi.Automation/BooksApi.Automation.csproj package --vulnerable --include-transitive
 
+      - name: Create test environment file
+        run: |
+          printf '%s\n'             'NODE_ENV=test'             'PORT=3000'             'DB_HOST=localhost'             'DB_PORT=5432'             'DB_NAME=books_api_test'             'DB_USER=postgres'             'DB_PASSWORD=postgres'             "JWT_SECRET=$JWT_SECRET"             'JWT_ISSUER=books-api'             'JWT_AUDIENCE=books-api-client' > .env.test
+
       - name: Run Jest security and CRUD tests
         run: npm test
 
