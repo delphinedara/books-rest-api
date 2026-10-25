@@ -1,110 +1,72 @@
-[![API Security and Automation CI](https://github.com/delphinedara/books-rest-api/actions/workflows/ci.yml/badge.svg)](https://github.com/delphinedara/books-rest-api/actions/workflows/ci.yml)
-
 # Books REST API — API Security & Test Automation
 
-A security-focused REST API and automated testing project built with **Node.js, Express, PostgreSQL, and C#**.
+A security-focused REST API built with **Node.js, Express, and PostgreSQL**, with automated API testing in **JavaScript and C#**. The project combines secure API development, authentication and authorization testing, and automated security checks through GitHub Actions.
 
-This project demonstrates practical cybersecurity and software testing skills through the implementation and validation of API security controls, including JWT authentication, role-based access control (RBAC), input validation, security headers, and automated negative testing.
+## Project Highlights
 
-**Career focus:** Cybersecurity Analyst (CySA), Security Analyst, Application Security, QA Automation Engineer, and SDET.
-
-## Portfolio Highlights
-
-- **24 automated API tests:** 20 Jest/Supertest tests and 4 C# BDD tests.
-- **Jest coverage:** 80.55% statements, 61.53% branches, 80.95% functions, 80.37% lines.
-- **API security:** JWT authentication, reader/admin RBAC, input validation, and negative security tests.
-- **OWASP API Security Top 10:** Automated tests for API2:2023 and API5:2023.
-- **DevSecOps:** GitHub Actions CI, CodeQL, Gitleaks, dependency auditing, and authenticated OWASP ZAP scanning.
-- **Engineering workflow:** Protected master branch, pull requests, and automated checks.
-
-### Project Documentation
-
-- [System Architecture](docs/ARCHITECTURE.md)
-- [Security Testing Strategy](docs/SECURITY_TESTING.md)
-- [Security Policy](SECURITY.md)
+- **REST API:** Create, retrieve, update, and delete books stored in PostgreSQL.
+- **Access control:** JWT authentication and reader/admin role-based authorization.
+- **Secure development:** Zod input validation, parameterized SQL, Helmet security headers, and API rate limiting.
+- **Automated tests:** 20 Jest/Supertest tests and 4 C# NUnit/Reqnroll/RestSharp BDD tests.
+- **OWASP-aligned testing:** Automated checks targeting API2:2023 (Broken Authentication) and API5:2023 (Broken Function Level Authorization).
+- **DevSecOps:** GitHub Actions CI, CodeQL, Gitleaks, dependency auditing, and authenticated OWASP ZAP baseline scanning.
+- **Versioned release:** [v1.0.0](https://github.com/delphinedara/books-rest-api/releases/tag/v1.0.0).
 
 ## Technology Stack
 
-| Category | Technologies |
+| Area | Technology |
 | --- | --- |
 | Backend | Node.js, Express |
 | Database | PostgreSQL |
-| Authentication | JSON Web Tokens (JWT) |
-| Authorization | Role-Based Access Control (RBAC) |
-| Input Validation | Zod |
-| Security Middleware | Helmet, Express Rate Limit |
-| JavaScript Testing | Jest, Supertest |
-| C# Automation | .NET 10, NUnit, Reqnroll, RestSharp |
-| Reporting | Allure (integration planned) |
-| Logging | Serilog (integration planned) |
-| Version Control | Git, GitHub |
+| Authentication and authorization | JWT (HS256), role-based access control (RBAC) |
+| Request validation | Zod |
+| HTTP security | Helmet, express-rate-limit |
+| JavaScript testing | Jest, Supertest |
+| C# BDD testing | .NET 10, NUnit, Reqnroll, RestSharp |
+| Security scanning | CodeQL, Gitleaks, OWASP ZAP, dependency auditing |
+| CI/CD | GitHub Actions |
 
-## Project Features
+## Architecture and Security Documentation
 
-- RESTful API supporting book creation, retrieval, updates, and deletion.
-- PostgreSQL database integration with UUID-based book identifiers.
-- JWT-based authentication with short-lived tokens.
-- Reader and admin role-based authorization.
-- Input validation using Zod.
-- HTTP security headers using Helmet.
-- API rate limiting.
-- Separate development and testing databases.
-- Automated JavaScript integration tests.
-- Automated C# behavior-driven security tests.
+- [System architecture](docs/ARCHITECTURE.md)
+- [Security testing strategy](docs/SECURITY_TESTING.md)
+- [Security policy and vulnerability reporting](SECURITY.md)
 
-## API Security Controls
+The API validates authentication and permissions before allowing protected operations. Request bodies are validated before database writes, and PostgreSQL queries use parameters rather than concatenating untrusted input.
 
-### JWT Authentication
+### Authentication and Authorization
 
-The API uses JSON Web Tokens to authenticate requests.
+Requests to protected endpoints require a JWT in the `Authorization` header:
 
-- Requests without valid authentication return HTTP `401`.
-- Tokens are signed using HS256.
-- Token validation includes issuer and audience checks.
-- Generated test tokens expire after approximately 15 minutes.
+```http
+Authorization: Bearer YOUR_TOKEN
+```
 
-### Role-Based Access Control (RBAC)
+The API validates token signatures, expiration, issuer (`books-api`), and audience (`books-api-client`). Generated test tokens expire after approximately **15 minutes**.
 
-Two roles are supported:
-
-- **Reader:** Can retrieve books.
-- **Admin:** Can retrieve, create, update, and delete books.
-
-| API Operation | Reader | Admin |
+| Operation | Reader | Admin |
 | --- | --- | --- |
 | Retrieve all books | Allowed | Allowed |
-| Retrieve book by ID | Allowed | Allowed |
-| Create book | Denied | Allowed |
-| Update book | Denied | Allowed |
-| Delete book | Denied | Allowed |
+| Retrieve a book by ID | Allowed | Allowed |
+| Create a book | Denied | Allowed |
+| Update a book | Denied | Allowed |
+| Delete a book | Denied | Allowed |
 
-Authenticated users attempting operations outside their permissions receive HTTP `403`.
-
-### Additional Security Measures
-
-- **Input validation:** Zod validates request data.
-- **Security headers:** Helmet applies protective HTTP headers.
-- **Rate limiting:** Express Rate Limit restricts excessive requests.
-- **Negative testing:** Automated tests verify rejected unauthorized and invalid requests.
-- **Test isolation:** Automated tests use a dedicated PostgreSQL database.
-
-These measures demonstrate security control implementation and validation, not a guarantee that the API is free of vulnerabilities.
+Requests without valid authentication return **HTTP 401**. Authenticated users attempting operations outside their role receive **HTTP 403**.
 
 ## API Endpoints
 
-Base URL:
+The API listens locally at `http://127.0.0.1:5000` by default.
 
-`http://127.0.0.1:5000`
-
-| Method | Endpoint | Description | Required Role |
+| Method | Endpoint | Purpose | Required role |
 | --- | --- | --- | --- |
-| GET | `/api/books` | Retrieve all books | Reader or Admin |
-| GET | `/api/books/:id` | Retrieve a book by ID | Reader or Admin |
+| GET | `/api/books` | List books | Reader or Admin |
+| GET | `/api/books/:id` | Retrieve a book | Reader or Admin |
 | POST | `/api/books` | Create a book | Admin |
 | PUT | `/api/books/:id` | Update a book | Admin |
 | DELETE | `/api/books/:id` | Delete a book | Admin |
 
-### Example Book Request
+Example request body for creating a book:
 
 ```json
 {
@@ -115,65 +77,38 @@ Base URL:
 }
 ```
 
-Book IDs are stored as UUIDs and exposed through the `_id` response field.
+Book identifiers are stored as UUIDs and returned in the `_id` field.
 
-## Project Structure
-
-```text
-books-rest-api/
-├── automation/
-│   └── BooksApi.Automation/
-│       ├── Features/
-│       │   └── BooksSecurity.feature
-│       ├── StepDefinitions/
-│       │   └── BooksSecuritySteps.cs
-│       ├── Support/
-│       │   └── TestContext.cs
-│       └── BooksApi.Automation.csproj
-├── db/
-├── models/
-├── scripts/
-│   └── createToken.js
-├── tests/
-├── auth.js
-├── jest.config.js
-├── server.js
-├── package.json
-└── README.md
-```
-
-## Local Setup
+## Getting Started
 
 ### Prerequisites
 
-- Node.js
+- Node.js and npm
 - PostgreSQL
-- .NET 10 SDK (for C# automation)
+- .NET 10 SDK (only required to run the C# BDD tests)
 
-### 1. Clone the Repository
+### 1. Clone and install
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/delphinedara/books-rest-api.git
 cd books-rest-api
 npm install
 ```
 
-### 2. Configure PostgreSQL
+### 2. Prepare PostgreSQL
 
-Create separate development and testing databases:
+Create separate development and test databases:
 
 ```sql
 CREATE DATABASE books_api;
 CREATE DATABASE books_api_test;
 ```
 
-Ensure the configured PostgreSQL user has access to both databases and that the project database schema is initialized.
+Ensure the configured PostgreSQL user can access both databases. Initialize the schema using the SQL resources in [`db/`](db/), as appropriate for your local PostgreSQL setup.
 
-### 3. Configure Environment Variables
+### 3. Configure environment variables
 
-Create `.env` for development and `.env.test` for automated testing.
-
-Example `.env`:
+Create a private `.env` file for local development:
 
 ```dotenv
 DB_HOST=127.0.0.1
@@ -187,15 +122,13 @@ JWT_ISSUER=books-api
 JWT_AUDIENCE=books-api-client
 ```
 
-For `.env.test`, use:
+Create a separate private `.env.test` with the same required settings, but use:
 
 ```dotenv
 DB_NAME=books_api_test
 ```
 
-Configure the remaining environment variables for your test environment.
-
-**Security:** Never commit `.env`, `.env.test`, database passwords, or JWT signing secrets to GitHub.
+Use a strong, private JWT signing secret. **Never commit `.env`, `.env.test`, database credentials, or JWT secrets.**
 
 ### 4. Start the API
 
@@ -203,178 +136,107 @@ Configure the remaining environment variables for your test environment.
 node server.js
 ```
 
-The API listens at:
+The default local address is:
 
-`http://127.0.0.1:5000`
+```text
+http://127.0.0.1:5000
+```
 
-## Authentication
+### 5. Generate authentication tokens
 
-Generate a reader token:
+In a terminal configured with the appropriate environment variables:
 
 ```bash
 node scripts/createToken.js reader
-```
-
-Generate an admin token:
-
-```bash
 node scripts/createToken.js admin
 ```
 
-Include the generated token in API requests:
-
-```http
-Authorization: Bearer YOUR_TOKEN
-```
-
-Tokens expire after approximately 15 minutes.
+Pass the generated token in the `Authorization: Bearer YOUR_TOKEN` header when calling protected endpoints. Regenerate tokens when they expire.
 
 ## Automated Testing
 
-This project uses two complementary testing approaches:
+The project uses two complementary API testing approaches: JavaScript integration tests and C# behavior-driven tests. Tests use a dedicated PostgreSQL test database to avoid modifying development data.
 
-1. **Jest and Supertest:** API integration and functional testing.
-2. **NUnit, Reqnroll, and RestSharp:** C# behavior-driven API security testing.
+### JavaScript — Jest and Supertest
 
-### JavaScript Integration Tests
+The JavaScript suite checks CRUD behavior, authentication, role-based permissions, request validation, security headers, and expected HTTP responses.
 
-The Jest/Supertest suite verifies:
-
-- Authentication
-- Role-based authorization
-- Input validation
-- Security headers
-- CRUD functionality
-- Expected HTTP responses
-
-Tests run against the isolated `books_api_test` PostgreSQL database.
-
-Run:
+Run the tests:
 
 ```bash
 npm test
 ```
 
-**Last verified result: 10 tests passed.**
-
-### C# BDD API Security Tests
-
-The C# automation framework uses Gherkin feature files and reusable step definitions.
-
-Example scenario:
-
-```gherkin
-Scenario: Reader cannot create books
-  Given I am authenticated as a reader
-  When I attempt to create a book
-  Then the response status should be 403
-```
-
-Current automated scenarios:
-
-| Scenario | Expected HTTP Status | Result |
-| --- | --- | --- |
-| Admin retrieves books | 200 | Passed |
-| Reader retrieves books | 200 | Passed |
-| Reader cannot create books | 403 | Passed |
-| Unauthenticated requests are rejected | 401 | Passed |
-
-**Last verified result: 4 tests passed, 0 failed.**
-
-### Running C# Tests
-
-Start the API using the test database in one terminal:
+Run tests with coverage reporting:
 
 ```bash
-cd books-rest-api
+npm run test:coverage
+```
 
+### C# — NUnit, Reqnroll, and RestSharp
+
+The C# suite uses Gherkin scenarios and reusable step definitions. Verified scenarios include:
+
+| Scenario | Expected result |
+| --- | --- |
+| Admin retrieves books | HTTP 200 |
+| Reader retrieves books | HTTP 200 |
+| Reader cannot create books | HTTP 403 |
+| Unauthenticated request is rejected | HTTP 401 |
+
+To run the C# suite locally, first start the API against the **test** database in one terminal:
+
+```bash
 set -a
 source .env.test
 set +a
-
 node server.js
 ```
 
-In another terminal, from the repository root:
+In a second terminal, from the repository root:
 
 ```bash
 set -a
 source .env.test
 set +a
-
 export BOOKS_READER_TOKEN="$(node scripts/createToken.js reader)"
 export BOOKS_ADMIN_TOKEN="$(node scripts/createToken.js admin)"
-
 cd automation/BooksApi.Automation
 dotnet test
 ```
 
-The API must be running before the C# tests execute.
+The API must be running for the C# tests. Tokens expire after approximately 15 minutes.
 
-Regenerate tokens when they expire.
+### Verified Test Results
 
-## Security Testing Strategy
+| Metric | Result |
+| --- | ---: |
+| Jest/Supertest tests | 20 passed |
+| C# BDD tests | 4 passed |
+| Jest statement coverage | 80.55% |
+| Jest branch coverage | 61.53% |
+| Jest function coverage | 80.95% |
+| Jest line coverage | 80.37% |
 
-The project focuses on repeatable testing of application security controls.
+Coverage figures are from a verified local Jest run. Coverage measures code execution, not security assurance.
 
-| Security Area | Testing Approach |
+## Continuous Integration and Security Scanning
+
+GitHub Actions automates testing and security checks across four workflows:
+
+| Workflow | Purpose |
 | --- | --- |
-| Authentication | Verify unauthenticated requests are rejected |
-| Authorization | Verify readers cannot perform admin operations |
-| Least Privilege | Restrict modification operations to admin users |
-| Input Validation | Verify invalid requests are rejected |
-| HTTP Security | Validate expected security headers |
-| Negative Testing | Confirm expected `4xx` responses |
-| Database Isolation | Use a separate database for automated tests |
-| Test Automation | Run repeatable JavaScript and C# test suites |
+| CI | PostgreSQL-backed JavaScript and C# tests, dependency auditing, and Jest coverage artifact |
+| CodeQL | Static application security analysis (SAST) |
+| Gitleaks | Detection of potential secrets in Git history |
+| OWASP ZAP | Baseline dynamic security scanning (DAST), including authenticated requests using a reader JWT |
 
-The project demonstrates API security control verification rather than a complete penetration test, vulnerability assessment, or Security Operations Center (SOC) implementation.
+The repository uses feature branches, pull requests, and checks on a protected `master` branch to validate changes before merging.
 
-## Roadmap
+## Security Testing Scope
 
-- [x] PostgreSQL integration
-- [x] JWT authentication
-- [x] Reader/admin role-based access control (RBAC)
-- [x] Input validation and security middleware
-- [x] HTTP security headers and rate limiting
-- [x] Jest/Supertest API integration tests
-- [x] C# NUnit/Reqnroll/RestSharp automation framework
-- [x] Automated authentication and authorization testing
-- [x] Passing C# API security scenarios
-- [x] Separate development and testing databases
-- [ ] Full C# CRUD automation
-- [ ] Automatic test-data cleanup
-- [ ] Allure test reporting
-- [ ] Structured test logging with Serilog
-- [ ] GitHub Actions continuous integration
-- [ ] Expanded OWASP API Security Top 10 testing
-- [ ] Automated dependency vulnerability scanning
-- [ ] Security event logging and monitoring
+Automated tests include checks aligned with **OWASP API2:2023 — Broken Authentication** and **OWASP API5:2023 — Broken Function Level Authorization**. The project also verifies input validation, HTTP security headers, and expected rejection responses.
 
-## Portfolio Purpose
+Security tools have different capabilities and limitations. Passing tests and scans does **not** establish that the application is free of vulnerabilities or constitute a comprehensive penetration test.
 
-This project demonstrates practical skills in **cybersecurity, API security testing, secure application development, and test automation**, relevant to the following roles:
-
-- Cybersecurity Analyst (CySA)
-- Security Analyst
-- Application Security Analyst
-- Security QA Engineer
-- QA Automation Engineer
-- Software Development Engineer in Test (SDET)
-
-### Cybersecurity Skills Demonstrated
-
-- **Authentication Security:** Implementing and testing JWT-based authentication to verify that unauthenticated requests are rejected.
-- **Access Control and Least Privilege:** Implementing RBAC to restrict sensitive API operations to authorized users.
-- **Security Control Validation:** Verifying authentication, authorization, input validation, and HTTP security controls through automated tests.
-- **Negative Security Testing:** Testing unauthorized access attempts, insufficient permissions, and invalid API requests.
-- **Secure API Development:** Applying security headers, request validation, and rate limiting to reduce common application security risks.
-- **Automated Security Testing:** Using C#, NUnit, Reqnroll, RestSharp, Jest, and Supertest to build repeatable API security and functional tests.
-- **Database and Environment Isolation:** Separating development and testing environments using PostgreSQL.
-- **Security Documentation:** Documenting API security controls, test coverage, expected behavior, and future security improvements.
-
-### Project Objective
-
-The objective of this project is to demonstrate how **secure application development, cybersecurity principles, and automated security testing** work together to identify security weaknesses, validate protective controls, and reduce application security risks.
-
-The project focuses on practical API security engineering and security control verification. It does not represent a complete penetration test or SOC monitoring implementation.
+For architecture details, test scope, and vulnerability reporting, see the [architecture](docs/ARCHITECTURE.md), [security testing](docs/SECURITY_TESTING.md), and [security policy](SECURITY.md) documents.
