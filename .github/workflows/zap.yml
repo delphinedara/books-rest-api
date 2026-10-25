@@ -89,13 +89,36 @@ jobs:
           cat /tmp/books-api-zap.log
           exit 1
 
-      - name: Run OWASP ZAP baseline scan
+      - name: Run authenticated OWASP ZAP baseline scan
         run: |
+          set -euo pipefail
+
           mkdir -p zap-reports
           chmod 777 zap-reports
 
+          # Generate a short-lived reader token without printing it.
+          token="$(node scripts/createToken.js reader)"
+          echo "::add-mask::$token"
+
+          # Verify the token works before starting ZAP.
+          status="$(curl --noproxy '*' -s -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer $token" \
+            http://127.0.0.1:3000/api/books)"
+
+          if [ "$status" != "200" ]; then
+            echo "Authenticated API readiness check failed: HTTP $status"
+            exit 1
+          fi
+
+          # Pass the token directly into ZAP's container environment.
+          # Avoid writing the token into tracked files or reports.
+          export ZAP_AUTH_HEADER_VALUE="Bearer $token"
+
           docker run --rm \
             --network host \
+            --env ZAP_AUTH_HEADER=Authorization \
+            --env ZAP_AUTH_HEADER_VALUE \
+            --env ZAP_AUTH_HEADER_SITE=http://127.0.0.1:3000 \
             -v "$PWD/zap-reports:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
@@ -104,6 +127,8 @@ jobs:
             -I \
             -r zap-report.html \
             -J zap-report.json
+
+          unset token ZAP_AUTH_HEADER_VALUE
 
       - name: Upload ZAP security reports
         if: always()
