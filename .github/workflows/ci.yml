@@ -70,6 +70,10 @@ jobs:
         run: |
           printf '%s\n'             'NODE_ENV=test'             'PORT=3000'             'DB_HOST=localhost'             'DB_PORT=5432'             'DB_NAME=books_api_test'             'DB_USER=postgres'             'DB_PASSWORD=postgres'             "JWT_SECRET=$JWT_SECRET"             'JWT_ISSUER=books-api'             'JWT_AUDIENCE=books-api-client' > .env.test
 
+      - name: Initialize PostgreSQL database
+        run: |
+          PGPASSWORD="$DB_PASSWORD" psql             -h "$DB_HOST"             -p "$DB_PORT"             -U "$DB_USER"             -d "$DB_NAME"             -v ON_ERROR_STOP=1             -f db/migrations/001_create_books.sql
+
       - name: Run Jest security and CRUD tests
         run: npm test
 
