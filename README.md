@@ -1,3 +1,5 @@
+[![API Security and Automation CI](https://github.com/delphinedara/books-rest-api/actions/workflows/ci.yml/badge.svg)](https://github.com/delphinedara/books-rest-api/actions/workflows/ci.yml)
+
 # Books REST API — API Security & Test Automation
 
 A security-focused REST API and automated testing project built with **Node.js, Express, PostgreSQL, and C#**.
