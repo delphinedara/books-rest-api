@@ -74,8 +74,15 @@ jobs:
         run: |
           PGPASSWORD="$DB_PASSWORD" psql             -h "$DB_HOST"             -p "$DB_PORT"             -U "$DB_USER"             -d "$DB_NAME"             -v ON_ERROR_STOP=1             -f db/migrations/001_create_books.sql
 
-      - name: Run Jest security and CRUD tests
-        run: npm test
+      - name: Run Jest tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload Jest coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-report
+          path: coverage/
+          if-no-files-found: error
 
       - name: Start API for C# tests
         run: |
