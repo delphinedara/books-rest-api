@@ -1,1 +1,32 @@
 **/node_modules
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+server.mongo.backup.js
+# .NET build artifacts
+**/bin/
+**/obj/
+**/TestResults/
+
+# Allure generated reports
+**/allure-results/
+**/allure-report/
+
+# Local backup files
+*.backup
+
+# Operating system files
+.DS_Store
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Editor backup files
+*.save
+
+# Reqnroll generated feature code
+*.feature.cs

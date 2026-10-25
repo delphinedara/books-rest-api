@@ -1,15 +1,10 @@
-// set up mongoose
-let mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-let BookSchema = new Schema({
-	//model properties
-	name:String,
-	author:String,
-	category: String,
-	isEasyRead: Boolean,
+const BookSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  author: { type: String, required: true, trim: true },
+  category: { type: String, required: true, trim: true },
+  isEasyRead: { type: Boolean, default: false }
 });
 
-let Book = mongoose.model('Book', BookSchema);
-
-module.exports = Book;
+module.exports = mongoose.model('Book', BookSchema);

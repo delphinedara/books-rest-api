@@ -1,11 +1,5 @@
-let mongoose = require('mongoose');
-// This is where we serve our DB!
-mongoose.connect(
-    process.env.MONGODB_URI ||
-    'mongodb://localhost/books-rest-api'
-);
+require('dotenv').config();
 
-
-let Book = require('./book');
-
-module.exports.Book=Book;
+module.exports = {
+  Book: require('./book')
+};
