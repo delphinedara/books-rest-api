@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check models/book.js && node --check models/index.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage"
   },
   "dependencies": {
     "dotenv": "^18.0.9",
