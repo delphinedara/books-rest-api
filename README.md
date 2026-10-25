@@ -8,6 +8,21 @@ This project demonstrates practical cybersecurity and software testing skills th
 
 **Career focus:** Cybersecurity Analyst (CySA), Security Analyst, Application Security, QA Automation Engineer, and SDET.
 
+## Portfolio Highlights
+
+- **24 automated API tests:** 20 Jest/Supertest tests and 4 C# BDD tests.
+- **Jest coverage:** 80.55% statements, 61.53% branches, 80.95% functions, 80.37% lines.
+- **API security:** JWT authentication, reader/admin RBAC, input validation, and negative security tests.
+- **OWASP API Security Top 10:** Automated tests for API2:2023 and API5:2023.
+- **DevSecOps:** GitHub Actions CI, CodeQL, Gitleaks, dependency auditing, and authenticated OWASP ZAP scanning.
+- **Engineering workflow:** Protected master branch, pull requests, and automated checks.
+
+### Project Documentation
+
+- [System Architecture](docs/ARCHITECTURE.md)
+- [Security Testing Strategy](docs/SECURITY_TESTING.md)
+- [Security Policy](SECURITY.md)
+
 ## Technology Stack
 
 | Category | Technologies |
